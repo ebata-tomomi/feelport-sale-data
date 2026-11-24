@@ -32,3 +32,17 @@ root.fpReorder=async function(grid,more,keyFor,title){
  }finally{if(more){if(old===null)more.removeAttribute('style');else more.setAttribute('style',old);}}
 };
 })(typeof window==='undefined'?globalThis:window);
+;(function(root){
+const buttons=new WeakMap();
+root.fpBuffer=function(grid,more,limit,next){
+ const cards=Array.from(grid.querySelectorAll(':scope > .product-card'));
+ const buffered=cards.length>limit;
+ if(!more||!more.parentNode)return false;
+ let state=buttons.get(grid);
+ if(buffered){
+  if(!state){const wrap=document.createElement('div');wrap.className='item-list-actions';const button=document.createElement('button');button.type='button';button.className='item-list-more';button.textContent='もっと見る';wrap.appendChild(button);more.parentNode.insertBefore(wrap,more);state={wrap,button,display:more.style.display};buttons.set(grid,state);}
+  state.button.onclick=next;state.wrap.style.display='';more.style.display='none';cards.slice(limit).forEach(c=>c.style.display='none');
+ }else if(state){state.wrap.remove();more.style.display=state.display;buttons.delete(grid);}
+ return buffered;
+};
+})(typeof window==='undefined'?globalThis:window);
